@@ -1,26 +1,13 @@
 import createClient from "openapi-fetch";
+import { useAuthStore } from "../../features/auth/model/auth-store";
 import type { paths } from "./generated/schema";
 import { ApiError } from "./errors";
-import { clearTokens, readTokens } from "./token-storage";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
-type AuthFailureHandler = (status: 401 | 403) => void;
+type AuthFailureHandler = (status: 401) => void;
 
 const authFailureHandlers = new Set<AuthFailureHandler>();
-let refreshInFlight: Promise<string | null> | null = null;
-
-async function refreshAccessToken(): Promise<string | null> {
-  if (refreshInFlight) {
-    return refreshInFlight;
-  }
-
-  refreshInFlight = Promise.resolve(null).finally(() => {
-    refreshInFlight = null;
-  });
-
-  return refreshInFlight;
-}
 
 export const apiClient = createClient<paths>({
   baseUrl
@@ -28,26 +15,22 @@ export const apiClient = createClient<paths>({
 
 apiClient.use({
   async onRequest({ request }) {
-    const tokens = readTokens();
-    if (!tokens?.accessToken) {
+    const accessToken = useAuthStore.getState().accessToken;
+    if (!accessToken) {
       return request;
     }
 
-    request.headers.set("Authorization", `Bearer ${tokens.accessToken}`);
-    request.headers.set("token", tokens.accessToken);
+    request.headers.set("Authorization", `Bearer ${accessToken}`);
+    request.headers.set("token", accessToken);
     return request;
   },
   async onResponse({ response }) {
-    if (response.status !== 401 && response.status !== 403) {
+    if (response.status !== 401) {
       return response;
     }
 
-    const nextAccessToken = await refreshAccessToken();
-    if (!nextAccessToken) {
-      clearTokens();
-      authFailureHandlers.forEach((handler) => handler(response.status as 401 | 403));
-    }
-
+    useAuthStore.getState().logout();
+    authFailureHandlers.forEach((handler) => handler(401));
     return response;
   }
 });
