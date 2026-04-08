@@ -81,9 +81,26 @@ export function TreePage() {
               onChange={(value) => setForm((current) => ({ ...current, first_name: value }))}
             />
             <Field
+              label="Patronymic / Middle name"
+              value={form.middle_name ?? ""}
+              onChange={(value) => setForm((current) => ({ ...current, middle_name: value }))}
+            />
+            <Field
               label="Last name"
               value={form.last_name ?? ""}
               onChange={(value) => setForm((current) => ({ ...current, last_name: value }))}
+            />
+            <Field
+              label="Birth date"
+              type="date"
+              value={form.birth_date ?? ""}
+              onChange={(value) => setForm((current) => ({ ...current, birth_date: value }))}
+            />
+            <Field
+              label="Death date"
+              type="date"
+              value={form.death_date ?? ""}
+              onChange={(value) => setForm((current) => ({ ...current, death_date: value }))}
             />
             <Field
               label="Description"

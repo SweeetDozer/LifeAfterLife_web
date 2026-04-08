@@ -11,6 +11,10 @@ import type { RelationshipCreate } from "../shared/types/api";
 
 type RelationshipType = RelationshipCreate["relationship_type"];
 
+function parsePositiveId(value: number): number | null {
+  return Number.isInteger(value) && value > 0 ? value : null;
+}
+
 export function RelationshipsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const parsedTreeId = Number(searchParams.get("treeId") ?? "");
@@ -41,8 +45,19 @@ export function RelationshipsPage() {
       return;
     }
 
+    const fromPersonId = parsePositiveId(form.from_person_id);
+    const toPersonId = parsePositiveId(form.to_person_id);
+    if (!fromPersonId || !toPersonId) {
+      setStatus("From person ID and To person ID must be positive integers.");
+      return;
+    }
+
     try {
-      const result = await createRelationshipMutation.mutateAsync(form);
+      const result = await createRelationshipMutation.mutateAsync({
+        ...form,
+        from_person_id: fromPersonId,
+        to_person_id: toPersonId
+      });
       setStatus(`Created relationship #${result.relationship_id}.`);
     } catch (error) {
       setStatus(getErrorMessage(error));
@@ -56,12 +71,14 @@ export function RelationshipsPage() {
           <form className="stack" onSubmit={handleSubmit}>
             <Field
               label="Tree ID"
+              min={1}
               type="number"
               value={Number.isFinite(parsedTreeId) && parsedTreeId > 0 ? String(parsedTreeId) : ""}
               onChange={(value) => setSearchParams(value ? { treeId: value } : {})}
             />
             <Field
               label="From person ID"
+              min={1}
               type="number"
               value={form.from_person_id ? String(form.from_person_id) : ""}
               onChange={(value) =>
@@ -70,6 +87,7 @@ export function RelationshipsPage() {
             />
             <Field
               label="To person ID"
+              min={1}
               type="number"
               value={form.to_person_id ? String(form.to_person_id) : ""}
               onChange={(value) =>

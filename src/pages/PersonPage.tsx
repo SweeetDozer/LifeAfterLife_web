@@ -21,13 +21,22 @@ export function PersonPage() {
 
   return (
     <PageSection title={`Person #${parsedPersonId}`} description="Person details come from a dedicated page-level fetch.">
-      <Panel title={personQuery.data ? `${personQuery.data.first_name} ${personQuery.data.last_name ?? ""}`.trim() : "Person details"}>
+      <Panel
+        title={
+          personQuery.data
+            ? `${personQuery.data.first_name} ${personQuery.data.middle_name ?? ""} ${personQuery.data.last_name ?? ""}`.replace(/\s+/g, " ").trim()
+            : "Person details"
+        }
+      >
         {personQuery.isLoading ? <p>Loading person...</p> : null}
         {personQuery.isError ? <p>{getErrorMessage(personQuery.error)}</p> : null}
         {personQuery.data ? (
           <div className="detail-list">
             <span>ID: {personQuery.data.id}</span>
             <span>Tree: {personQuery.data.tree_id}</span>
+            <span>Patronymic / Middle name: {personQuery.data.middle_name ?? "Not provided"}</span>
+            <span>Birth date: {personQuery.data.birth_date ?? "Not provided"}</span>
+            <span>Death date: {personQuery.data.death_date ?? "Not provided"}</span>
             <span>Gender: {personQuery.data.gender ?? "unknown"}</span>
             <span>Description: {personQuery.data.description ?? "No description"}</span>
             <Link className="ghost-link" to={`/trees/${personQuery.data.tree_id}`}>

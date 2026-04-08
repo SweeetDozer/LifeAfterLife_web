@@ -21,7 +21,6 @@ apiClient.use({
     }
 
     request.headers.set("Authorization", `Bearer ${accessToken}`);
-    request.headers.set("token", accessToken);
     return request;
   },
   async onResponse({ response }) {

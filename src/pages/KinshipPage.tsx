@@ -7,6 +7,22 @@ import { Field } from "../shared/ui/Field";
 import { PageSection } from "../shared/ui/PageSection";
 import { Panel } from "../shared/ui/Panel";
 
+function parsePositiveId(value: string): number | null {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function hasSameParams(
+  current: { treeId: number; fromPersonId: number; toPersonId: number } | null,
+  next: { treeId: number; fromPersonId: number; toPersonId: number }
+) {
+  return (
+    current?.treeId === next.treeId &&
+    current?.fromPersonId === next.fromPersonId &&
+    current?.toPersonId === next.toPersonId
+  );
+}
+
 export function KinshipPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const parsedTreeId = Number(searchParams.get("treeId") ?? "");
@@ -35,11 +51,25 @@ export function KinshipPage() {
       return;
     }
 
-    setGraphQueryParams({
+    const fromPersonId = parsePositiveId(form.from_person_id);
+    const toPersonId = parsePositiveId(form.to_person_id);
+    if (!fromPersonId || !toPersonId) {
+      setStatus("From person ID and To person ID must be positive integers.");
+      return;
+    }
+
+    const nextParams = {
       treeId: parsedTreeId,
-      fromPersonId: Number(form.from_person_id),
-      toPersonId: Number(form.to_person_id)
-    });
+      fromPersonId,
+      toPersonId
+    };
+
+    if (hasSameParams(graphQueryParams, nextParams)) {
+      void graphPathQuery.refetch();
+    } else {
+      setGraphQueryParams(nextParams);
+    }
+
     setStatus("Graph path requested.");
   }
 
@@ -49,11 +79,25 @@ export function KinshipPage() {
       return;
     }
 
-    setKinshipQueryParams({
+    const fromPersonId = parsePositiveId(form.from_person_id);
+    const toPersonId = parsePositiveId(form.to_person_id);
+    if (!fromPersonId || !toPersonId) {
+      setStatus("From person ID and To person ID must be positive integers.");
+      return;
+    }
+
+    const nextParams = {
       treeId: parsedTreeId,
-      fromPersonId: Number(form.from_person_id),
-      toPersonId: Number(form.to_person_id)
-    });
+      fromPersonId,
+      toPersonId
+    };
+
+    if (hasSameParams(kinshipQueryParams, nextParams)) {
+      void kinshipQuery.refetch();
+    } else {
+      setKinshipQueryParams(nextParams);
+    }
+
     setStatus("Kinship requested.");
   }
 
@@ -64,18 +108,21 @@ export function KinshipPage() {
           <form className="stack" onSubmit={handlePathSubmit}>
             <Field
               label="Tree ID"
+              min={1}
               type="number"
               value={Number.isFinite(parsedTreeId) && parsedTreeId > 0 ? String(parsedTreeId) : ""}
               onChange={(value) => setSearchParams(value ? { treeId: value } : {})}
             />
             <Field
               label="From person ID"
+              min={1}
               type="number"
               value={form.from_person_id}
               onChange={(value) => setForm((current) => ({ ...current, from_person_id: value }))}
             />
             <Field
               label="To person ID"
+              min={1}
               type="number"
               value={form.to_person_id}
               onChange={(value) => setForm((current) => ({ ...current, to_person_id: value }))}
