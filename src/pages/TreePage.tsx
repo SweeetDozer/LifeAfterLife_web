@@ -146,6 +146,9 @@ export function TreePage() {
             </div>
             {personsQuery.isLoading ? <p>Loading persons...</p> : null}
             {personsQuery.isError ? <p>{getErrorMessage(personsQuery.error)}</p> : null}
+            {!personsQuery.isLoading && !personsQuery.isError && (personsQuery.data?.length ?? 0) === 0 ? (
+              <p>No persons in this tree yet.</p>
+            ) : null}
             <div className="list">
               {personLinks.map((person) => (
                 <Link className="list-item" key={person.id} to={`/persons/${person.id}`}>

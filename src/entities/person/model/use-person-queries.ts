@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../../shared/api/query-keys";
-import { createPerson, getPerson, getPersonsByTree } from "../api/person-api";
+import { createPerson, deletePerson, getPerson, getPersonsByTree, updatePerson } from "../api/person-api";
 
 export function usePersonsByTreeQuery(treeId: number, enabled: boolean) {
   return useQuery({
@@ -25,6 +25,34 @@ export function useCreatePersonMutation(treeId: number) {
     mutationFn: createPerson,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.personsByTree(treeId) });
+    }
+  });
+}
+
+export function useUpdatePersonMutation(personId: number, treeId: number | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof updatePerson>[1]) => updatePerson(personId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.person(personId) });
+      if (treeId) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.personsByTree(treeId) });
+      }
+    }
+  });
+}
+
+export function useDeletePersonMutation(personId: number, treeId: number | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => deletePerson(personId),
+    onSuccess: () => {
+      void queryClient.removeQueries({ queryKey: queryKeys.person(personId) });
+      if (treeId) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.personsByTree(treeId) });
+      }
     }
   });
 }

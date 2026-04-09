@@ -69,6 +69,9 @@ export function DashboardPage() {
             </button>
             {treesQuery.isLoading ? <p>Loading trees...</p> : null}
             {treesQuery.isError ? <p>{getErrorMessage(treesQuery.error)}</p> : null}
+            {!treesQuery.isLoading && !treesQuery.isError && (treesQuery.data?.length ?? 0) === 0 ? (
+              <p>No trees yet. Create the first one using the form.</p>
+            ) : null}
             <div className="list">
               {(treesQuery.data ?? []).map((tree) => (
                 <Link className="list-item" key={tree.id} to={`/trees/${tree.id}`}>

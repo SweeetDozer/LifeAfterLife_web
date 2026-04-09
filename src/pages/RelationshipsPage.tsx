@@ -1,7 +1,10 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { usePersonsByTreeQuery } from "../entities/person/model/use-person-queries";
-import { useCreateRelationshipMutation } from "../entities/relationship/model/use-relationship-mutations";
+import {
+  useCreateRelationshipMutation,
+  useDeleteRelationshipMutation
+} from "../entities/relationship/model/use-relationship-mutations";
 import { useSession } from "../features/auth/model/session-context";
 import { getErrorMessage } from "../shared/api/client";
 import { Field } from "../shared/ui/Field";
@@ -22,11 +25,13 @@ export function RelationshipsPage() {
   const isValidTreeId = Number.isFinite(parsedTreeId) && parsedTreeId > 0;
   const personsQuery = usePersonsByTreeQuery(parsedTreeId, isValidTreeId);
   const createRelationshipMutation = useCreateRelationshipMutation(isValidTreeId ? parsedTreeId : null);
+  const deleteRelationshipMutation = useDeleteRelationshipMutation(isValidTreeId ? parsedTreeId : null);
   const [form, setForm] = useState<RelationshipCreate>({
     from_person_id: 0,
     to_person_id: 0,
     relationship_type: "parent"
   });
+  const [relationshipIdToDelete, setRelationshipIdToDelete] = useState("");
 
   const personOptions = useMemo(
     () =>
@@ -59,6 +64,26 @@ export function RelationshipsPage() {
         to_person_id: toPersonId
       });
       setStatus(`Created relationship #${result.relationship_id}.`);
+    } catch (error) {
+      setStatus(getErrorMessage(error));
+    }
+  }
+
+  async function handleDeleteSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const relationshipId = parsePositiveId(Number(relationshipIdToDelete));
+    if (!relationshipId) {
+      setStatus("Relationship ID must be a positive integer.");
+      return;
+    }
+
+    try {
+      const result = await deleteRelationshipMutation.mutateAsync(relationshipId);
+      setRelationshipIdToDelete("");
+      setStatus(
+        `Deleted ${result.deleted_relationships} relationship(s). ${result.detail}`
+      );
     } catch (error) {
       setStatus(getErrorMessage(error));
     }
@@ -115,6 +140,24 @@ export function RelationshipsPage() {
           </form>
         </Panel>
 
+        <Panel
+          title="Delete relationship"
+          subtitle="Manual delete by relationship ID. A list endpoint is not available in the current UI flow."
+        >
+          <form className="stack" onSubmit={handleDeleteSubmit}>
+            <Field
+              label="Relationship ID"
+              min={1}
+              type="number"
+              value={relationshipIdToDelete}
+              onChange={setRelationshipIdToDelete}
+            />
+            <button className="ghost" type="submit">
+              Delete relationship
+            </button>
+          </form>
+        </Panel>
+
         <Panel title="Persons in this tree">
           <div className="stack">
             <Link
@@ -125,6 +168,9 @@ export function RelationshipsPage() {
             </Link>
             {personsQuery.isLoading ? <p>Loading persons...</p> : null}
             {personsQuery.isError ? <p>{getErrorMessage(personsQuery.error)}</p> : null}
+            {!personsQuery.isLoading && !personsQuery.isError && (personOptions.length === 0) ? (
+              <p>No persons found for this tree.</p>
+            ) : null}
             <div className="list">
               {personOptions.map((person) => (
                 <div className="list-item" key={person.id}>
@@ -138,6 +184,8 @@ export function RelationshipsPage() {
       </div>
       {createRelationshipMutation.isPending ? <p>Saving relationship...</p> : null}
       {createRelationshipMutation.isError ? <p>{getErrorMessage(createRelationshipMutation.error)}</p> : null}
+      {deleteRelationshipMutation.isPending ? <p>Deleting relationship...</p> : null}
+      {deleteRelationshipMutation.isError ? <p>{getErrorMessage(deleteRelationshipMutation.error)}</p> : null}
     </PageSection>
   );
 }
