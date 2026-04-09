@@ -38,6 +38,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh Tokens */
+        post: operations["refresh_tokens_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout */
+        post: operations["logout_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout All */
+        post: operations["logout_all_auth_logout_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/revoke-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke Session */
+        post: operations["revoke_session_auth_revoke_session_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/trees/": {
         parameters: {
             query?: never;
@@ -54,6 +122,60 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/trees/{tree_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Tree */
+        delete: operations["delete_tree_trees__tree_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Tree */
+        patch: operations["update_tree_trees__tree_id__patch"];
+        trace?: never;
+    };
+    "/trees/{tree_id}/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tree Access */
+        get: operations["get_tree_access_trees__tree_id__access_get"];
+        put?: never;
+        /** Grant Tree Access */
+        post: operations["grant_tree_access_trees__tree_id__access_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trees/{tree_id}/access/{target_user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Tree Access */
+        delete: operations["revoke_tree_access_trees__tree_id__access__target_user_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Tree Access */
+        patch: operations["update_tree_access_trees__tree_id__access__target_user_id__patch"];
         trace?: never;
     };
     "/persons/": {
@@ -101,10 +223,12 @@ export interface paths {
         get: operations["get_person_persons__person_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete Person */
+        delete: operations["delete_person_persons__person_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update Person */
+        patch: operations["update_person_persons__person_id__patch"];
         trace?: never;
     };
     "/relationships/": {
@@ -119,6 +243,23 @@ export interface paths {
         /** Create Relationship */
         post: operations["create_relationship_relationships__post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/relationships/{relationship_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Relationship */
+        delete: operations["delete_relationship_relationships__relationship_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -162,6 +303,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AuthSessionActionResponse */
+        AuthSessionActionResponse: {
+            /** Detail */
+            detail: string;
+        };
         /** GraphPathResponse */
         GraphPathResponse: {
             /** Path */
@@ -221,6 +367,13 @@ export interface components {
             /** Person Id */
             person_id: number;
         };
+        /** PersonDeleteResponse */
+        PersonDeleteResponse: {
+            /** Detail */
+            detail: string;
+            /** Deleted Relationships */
+            deleted_relationships: number;
+        };
         /** PersonRead */
         PersonRead: {
             /** First Name */
@@ -244,6 +397,30 @@ export interface components {
             /** Tree Id */
             tree_id: number;
         };
+        /** PersonUpdate */
+        PersonUpdate: {
+            /** First Name */
+            first_name?: string | null;
+            /** Middle Name */
+            middle_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
+            /** Death Date */
+            death_date?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Photo Url */
+            photo_url?: string | null;
+            /** Gender */
+            gender?: ("male" | "female" | "other") | null;
+        };
+        /** RefreshTokenRequest */
+        RefreshTokenRequest: {
+            /** Refresh Token */
+            refresh_token: string;
+        };
         /** RelationshipCreate */
         RelationshipCreate: {
             /** From Person Id */
@@ -261,6 +438,68 @@ export interface components {
             /** Relationship Id */
             relationship_id: number;
         };
+        /** RelationshipDeleteResponse */
+        RelationshipDeleteResponse: {
+            /** Detail */
+            detail: string;
+            /** Deleted Relationships */
+            deleted_relationships: number;
+        };
+        /** TreeAccessGrantRequest */
+        TreeAccessGrantRequest: {
+            /** Email */
+            email: string;
+            /**
+             * Access Level
+             * @enum {string}
+             */
+            access_level: "viewer" | "editor";
+        };
+        /** TreeAccessGrantResponse */
+        TreeAccessGrantResponse: {
+            /** User Id */
+            user_id: number;
+            /**
+             * Access Level
+             * @enum {string}
+             */
+            access_level: "viewer" | "editor";
+        };
+        /** TreeAccessRead */
+        TreeAccessRead: {
+            /** User Id */
+            user_id: number;
+            /** Email */
+            email: string;
+            /**
+             * Access Level
+             * @enum {string}
+             */
+            access_level: "owner" | "editor" | "viewer";
+        };
+        /** TreeAccessRevokeResponse */
+        TreeAccessRevokeResponse: {
+            /** Detail */
+            detail: string;
+        };
+        /** TreeAccessUpdateRequest */
+        TreeAccessUpdateRequest: {
+            /**
+             * Access Level
+             * @enum {string}
+             */
+            access_level: "viewer" | "editor";
+        };
+        /** TreeAccessUpdateResponse */
+        TreeAccessUpdateResponse: {
+            /** User Id */
+            user_id: number;
+            /**
+             * Access Level
+             * @enum {string}
+             */
+            access_level: "viewer" | "editor";
+        };
         /** TreeCreate */
         TreeCreate: {
             /** Name */
@@ -277,6 +516,17 @@ export interface components {
         TreeCreateResponse: {
             /** Tree Id */
             tree_id: number;
+        };
+        /** TreeDeleteResponse */
+        TreeDeleteResponse: {
+            /** Detail */
+            detail: string;
+            /** Deleted Persons */
+            deleted_persons: number;
+            /** Deleted Relationships */
+            deleted_relationships: number;
+            /** Deleted Access Entries */
+            deleted_access_entries: number;
         };
         /** TreeRead */
         TreeRead: {
@@ -302,7 +552,16 @@ export interface components {
              * Access Level
              * @enum {string}
              */
-            access_level: "owner" | "view" | "edit";
+            access_level: "owner" | "editor" | "viewer";
+        };
+        /** TreeUpdate */
+        TreeUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Is Public */
+            is_public?: boolean | null;
         };
         /** UserCreate */
         UserCreate: {
@@ -328,6 +587,8 @@ export interface components {
         UserLoginResponse: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
             /**
              * Token Type
              * @constant
@@ -427,6 +688,140 @@ export interface operations {
             };
         };
     };
+    refresh_tokens_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserLoginResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSessionActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_all_auth_logout_all_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSessionActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_session_auth_revoke_session_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthSessionActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_trees_trees__get: {
         parameters: {
             query?: never;
@@ -482,6 +877,224 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TreeCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_tree_trees__tree_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeDeleteResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_tree_trees__tree_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tree_access_trees__tree_id__access_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeAccessRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grant_tree_access_trees__tree_id__access_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreeAccessGrantRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeAccessGrantResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_tree_access_trees__tree_id__access__target_user_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+                target_user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeAccessRevokeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_tree_access_trees__tree_id__access__target_user_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                tree_id: number;
+                target_user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreeAccessUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeAccessUpdateResponse"];
                 };
             };
             /** @description Validation Error */
@@ -599,6 +1212,78 @@ export interface operations {
             };
         };
     };
+    delete_person_persons__person_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                person_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDeleteResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_person_persons__person_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                person_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_relationship_relationships__post: {
         parameters: {
             query?: never;
@@ -622,6 +1307,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RelationshipCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_relationship_relationships__relationship_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                token?: string | null;
+            };
+            path: {
+                relationship_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RelationshipDeleteResponse"];
                 };
             };
             /** @description Validation Error */

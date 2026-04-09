@@ -2,13 +2,19 @@ import { clearAuthTokens, getAuthTokens, setAuthTokens } from "./token-utils";
 import type { AuthRefreshResult } from "./types";
 
 export type RefreshTokensHandler = () => Promise<AuthRefreshResult | null>;
+export type LogoutSessionHandler = () => Promise<void>;
 
 let refreshTokensHandler: RefreshTokensHandler | null = null;
 let activeRefreshPromise: Promise<AuthRefreshResult | null> | null = null;
+let logoutSessionHandler: LogoutSessionHandler | null = null;
+let activeLogoutPromise: Promise<void> | null = null;
 
 export function registerRefreshTokensHandler(handler: RefreshTokensHandler | null) {
-  // TODO: register a real refresh handler only after the backend exposes it in OpenAPI.
   refreshTokensHandler = handler;
+}
+
+export function registerLogoutSessionHandler(handler: LogoutSessionHandler | null) {
+  logoutSessionHandler = handler;
 }
 
 export async function refreshAuthTokens() {
@@ -44,6 +50,25 @@ export async function refreshAuthTokens() {
   })();
 
   return activeRefreshPromise;
+}
+
+export async function logoutAuthSession() {
+  if (activeLogoutPromise) {
+    return activeLogoutPromise;
+  }
+
+  activeLogoutPromise = (async () => {
+    try {
+      await logoutSessionHandler?.();
+    } catch {
+      // Ignore logout request errors and clear local auth state anyway.
+    } finally {
+      clearAuthTokens();
+      activeLogoutPromise = null;
+    }
+  })();
+
+  return activeLogoutPromise;
 }
 
 export function getRefreshAvailability() {

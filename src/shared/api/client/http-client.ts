@@ -1,10 +1,13 @@
 import createClient from "openapi-fetch";
 import { apiConfig } from "../../config/api";
-import { clearAuthTokens, getAccessToken, getRefreshAvailability, notifyAuthFailure, refreshAuthTokens } from "../auth";
+import { getAccessToken } from "../auth";
+import { notifyAuthFailure } from "../auth/auth-events";
+import { getRefreshAvailability, logoutAuthSession, refreshAuthTokens } from "../auth/refresh-controller";
 import type { paths } from "../generated/schema";
 import { ApiError } from "./errors";
 
 const AUTH_RETRY_HEADER = "x-lal-auth-retry";
+const NON_RETRYABLE_AUTH_PATHS = new Set(["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"]);
 
 const requestClones = new Map<string, Request>();
 
@@ -23,11 +26,15 @@ apiClient.use({
     requestClones.set(id, request.clone());
     return request;
   },
-  async onResponse({ id, request, response }) {
+  async onResponse({ id, request, response, schemaPath }) {
     const originalRequest = requestClones.get(id) ?? request;
     requestClones.delete(id);
 
     if (response.status !== 401) {
+      return response;
+    }
+
+    if (NON_RETRYABLE_AUTH_PATHS.has(schemaPath)) {
       return response;
     }
 
@@ -36,21 +43,21 @@ apiClient.use({
     }
 
     if (originalRequest.headers.get(AUTH_RETRY_HEADER) === "1") {
-      clearAuthTokens();
+      await logoutAuthSession();
       notifyAuthFailure(401);
       return response;
     }
 
     const refreshAvailability = getRefreshAvailability();
     if (!refreshAvailability.hasRefreshToken || !refreshAvailability.hasRefreshHandler) {
-      clearAuthTokens();
+      await logoutAuthSession();
       notifyAuthFailure(401);
       return response;
     }
 
     const refreshedTokens = await refreshAuthTokens();
     if (!refreshedTokens?.accessToken) {
-      clearAuthTokens();
+      await logoutAuthSession();
       notifyAuthFailure(401);
       return response;
     }
@@ -65,7 +72,7 @@ apiClient.use({
     const retryResponse = await fetch(retryRequest);
 
     if (retryResponse.status === 401) {
-      clearAuthTokens();
+      await logoutAuthSession();
       notifyAuthFailure(401);
     }
 
