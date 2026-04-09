@@ -32,6 +32,7 @@ export function RelationshipsPage() {
     relationship_type: "parent"
   });
   const [relationshipIdToDelete, setRelationshipIdToDelete] = useState("");
+  const [lastCreatedRelationshipId, setLastCreatedRelationshipId] = useState<number | null>(null);
 
   const personOptions = useMemo(
     () =>
@@ -63,6 +64,8 @@ export function RelationshipsPage() {
         from_person_id: fromPersonId,
         to_person_id: toPersonId
       });
+      setLastCreatedRelationshipId(result.relationship_id);
+      setRelationshipIdToDelete(String(result.relationship_id));
       setStatus(`Created relationship #${result.relationship_id}.`);
     } catch (error) {
       setStatus(getErrorMessage(error));
@@ -72,7 +75,11 @@ export function RelationshipsPage() {
   async function handleDeleteSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const relationshipId = parsePositiveId(Number(relationshipIdToDelete));
+    await handleDeleteRelationshipById(relationshipIdToDelete);
+  }
+
+  async function handleDeleteRelationshipById(rawRelationshipId: string) {
+    const relationshipId = parsePositiveId(Number(rawRelationshipId));
     if (!relationshipId) {
       setStatus("Relationship ID must be a positive integer.");
       return;
@@ -80,6 +87,9 @@ export function RelationshipsPage() {
 
     try {
       const result = await deleteRelationshipMutation.mutateAsync(relationshipId);
+      if (lastCreatedRelationshipId === relationshipId) {
+        setLastCreatedRelationshipId(null);
+      }
       setRelationshipIdToDelete("");
       setStatus(
         `Deleted ${result.deleted_relationships} relationship(s). ${result.detail}`
@@ -90,7 +100,10 @@ export function RelationshipsPage() {
   }
 
   return (
-    <PageSection title={`Relationships for tree #${parsedTreeId}`} description="Mutation-only page for relationship creation.">
+    <PageSection
+      title={`Relationships for tree #${parsedTreeId}`}
+      description="Create or remove direct relationships between people in the selected tree."
+    >
       <div className="page-grid">
         <Panel title="Create relationship">
           <form className="stack" onSubmit={handleSubmit}>
@@ -101,26 +114,46 @@ export function RelationshipsPage() {
               value={Number.isFinite(parsedTreeId) && parsedTreeId > 0 ? String(parsedTreeId) : ""}
               onChange={(value) => setSearchParams(value ? { treeId: value } : {})}
             />
-            <Field
-              label="From person ID"
-              min={1}
-              type="number"
-              value={form.from_person_id ? String(form.from_person_id) : ""}
-              onChange={(value) =>
-                setForm((current) => ({ ...current, from_person_id: Number(value) || 0 }))
-              }
-            />
-            <Field
-              label="To person ID"
-              min={1}
-              type="number"
-              value={form.to_person_id ? String(form.to_person_id) : ""}
-              onChange={(value) =>
-                setForm((current) => ({ ...current, to_person_id: Number(value) || 0 }))
-              }
-            />
             <label>
-              <span>Relationship type</span>
+              <span>Person A</span>
+              <select
+                value={form.from_person_id ? String(form.from_person_id) : ""}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    from_person_id: Number(event.target.value) || 0
+                  }))
+                }
+              >
+                <option value="">Select a person</option>
+                {personOptions.map((person) => (
+                  <option key={person.id} value={person.id}>
+                    {person.label} (ID {person.id})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Person B</span>
+              <select
+                value={form.to_person_id ? String(form.to_person_id) : ""}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    to_person_id: Number(event.target.value) || 0
+                  }))
+                }
+              >
+                <option value="">Select a person</option>
+                {personOptions.map((person) => (
+                  <option key={person.id} value={person.id}>
+                    {person.label} (ID {person.id})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Relationship type from Person A to Person B</span>
               <select
                 value={form.relationship_type}
                 onChange={(event) =>
@@ -142,9 +175,21 @@ export function RelationshipsPage() {
 
         <Panel
           title="Delete relationship"
-          subtitle="Manual delete by relationship ID. A list endpoint is not available in the current UI flow."
+          subtitle="A full relationship list is not available in the current API flow, so deletion stays intentionally minimal."
         >
           <form className="stack" onSubmit={handleDeleteSubmit}>
+            {lastCreatedRelationshipId ? (
+              <button
+                className="ghost"
+                type="button"
+                onClick={() => {
+                  setRelationshipIdToDelete(String(lastCreatedRelationshipId));
+                  void handleDeleteRelationshipById(String(lastCreatedRelationshipId));
+                }}
+              >
+                Delete the last created relationship (#{lastCreatedRelationshipId})
+              </button>
+            ) : null}
             <Field
               label="Relationship ID"
               min={1}
@@ -153,12 +198,12 @@ export function RelationshipsPage() {
               onChange={setRelationshipIdToDelete}
             />
             <button className="ghost" type="submit">
-              Delete relationship
+              Delete by relationship ID
             </button>
           </form>
         </Panel>
 
-        <Panel title="Persons in this tree">
+        <Panel title="Available people">
           <div className="stack">
             <Link
               className="ghost-link"
@@ -166,10 +211,10 @@ export function RelationshipsPage() {
             >
               Back to tree
             </Link>
-            {personsQuery.isLoading ? <p>Loading persons...</p> : null}
+            {personsQuery.isLoading ? <p>Loading people...</p> : null}
             {personsQuery.isError ? <p>{getErrorMessage(personsQuery.error)}</p> : null}
             {!personsQuery.isLoading && !personsQuery.isError && (personOptions.length === 0) ? (
-              <p>No persons found for this tree.</p>
+              <p>No people found for this tree. Add people on the tree page first.</p>
             ) : null}
             <div className="list">
               {personOptions.map((person) => (

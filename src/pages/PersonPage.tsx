@@ -111,10 +111,10 @@ export function PersonPage() {
   }
 
   return (
-    <PageSection title={`Person #${parsedPersonId}`} description="Person details come from a dedicated page-level fetch.">
+    <PageSection title={`Person #${parsedPersonId}`} description="Review the current data, update it, or remove the person from the tree.">
       <div className="page-grid">
         <Panel title={personTitle}>
-          {personQuery.isLoading ? <p>Loading person...</p> : null}
+          {personQuery.isLoading ? <p>Loading person details...</p> : null}
           {personQuery.isError ? <p>{getErrorMessage(personQuery.error)}</p> : null}
           {!personQuery.isLoading && !personQuery.isError && !personQuery.data ? <p>Person not found.</p> : null}
           {personQuery.data ? (
@@ -124,6 +124,7 @@ export function PersonPage() {
               <span>Patronymic / Middle name: {personQuery.data.middle_name ?? "Not provided"}</span>
               <span>Birth date: {personQuery.data.birth_date ?? "Not provided"}</span>
               <span>Death date: {personQuery.data.death_date ?? "Not provided"}</span>
+              <span>Photo URL: {personQuery.data.photo_url ?? "Not provided"}</span>
               <span>Gender: {personQuery.data.gender ?? "unknown"}</span>
               <span>Description: {personQuery.data.description ?? "No description"}</span>
               <Link className="ghost-link" to={`/trees/${personQuery.data.tree_id}`}>
@@ -196,7 +197,7 @@ export function PersonPage() {
                 </select>
               </label>
               <div className="actions-row">
-                <button type="submit">Save changes</button>
+                <button type="submit">Save person</button>
                 <button className="ghost" type="button" onClick={() => void handleDeleteClick()}>
                   Delete person
                 </button>
@@ -205,7 +206,7 @@ export function PersonPage() {
           )}
         </Panel>
       </div>
-      {updatePersonMutation.isPending ? <p>Saving person...</p> : null}
+      {updatePersonMutation.isPending ? <p>Saving person changes...</p> : null}
       {updatePersonMutation.isError ? <p>{getErrorMessage(updatePersonMutation.error)}</p> : null}
       {deletePersonMutation.isPending ? <p>Deleting person...</p> : null}
       {deletePersonMutation.isError ? <p>{getErrorMessage(deletePersonMutation.error)}</p> : null}

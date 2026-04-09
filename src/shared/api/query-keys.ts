@@ -1,5 +1,6 @@
 export const queryKeys = {
   trees: ["trees"] as const,
+  treeAccess: (treeId: number) => ["trees", "access", treeId] as const,
   personsByTree: (treeId: number) => ["persons", "tree", treeId] as const,
   person: (personId: number) => ["persons", "detail", personId] as const,
   graphPath: (treeId: number, fromPersonId: number, toPersonId: number) =>
