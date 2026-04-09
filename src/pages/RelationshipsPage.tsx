@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePersonsByTreeQuery } from "../entities/person/model/use-person-queries";
 import { useCreateRelationshipMutation } from "../entities/relationship/model/use-relationship-mutations";
 import { useSession } from "../features/auth/model/session-context";
-import { getErrorMessage } from "../shared/api/errors";
+import { getErrorMessage } from "../shared/api/client";
 import { Field } from "../shared/ui/Field";
 import { PageSection } from "../shared/ui/PageSection";
 import { Panel } from "../shared/ui/Panel";

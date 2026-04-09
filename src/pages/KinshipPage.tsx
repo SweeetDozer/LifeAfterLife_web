@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useGraphPathQuery, useKinshipQuery } from "../entities/kinship/model/use-kinship-queries";
 import { useSession } from "../features/auth/model/session-context";
-import { getErrorMessage } from "../shared/api/errors";
+import { getErrorMessage } from "../shared/api/client";
 import { Field } from "../shared/ui/Field";
 import { PageSection } from "../shared/ui/PageSection";
 import { Panel } from "../shared/ui/Panel";

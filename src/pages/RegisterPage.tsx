@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../features/auth/model/use-auth-mutations";
 import { useSession } from "../features/auth/model/session-context";
 import { AuthForm } from "../features/auth/ui/AuthForm";
-import { getErrorMessage } from "../shared/api/errors";
+import { getErrorMessage } from "../shared/api/client";
 import { PageSection } from "../shared/ui/PageSection";
 import type { UserLogin } from "../shared/types/api";
 

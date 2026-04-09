@@ -1,7 +1,6 @@
-import { apiClient } from "../../../shared/api/client";
-import { unwrap } from "../../../shared/api/result";
+import { setAuthTokens } from "../../../shared/api/auth";
+import { apiClient, unwrap } from "../../../shared/api/client";
 import type { UserCreate, UserLogin } from "../../../shared/types/api";
-import { useAuthStore } from "../model/auth-store";
 
 export async function registerUser(payload: UserCreate) {
   const { data, error, response } = await apiClient.POST("/auth/register", {
@@ -17,7 +16,11 @@ export async function loginUser(payload: UserLogin) {
   });
 
   const result = unwrap(data, error, response);
-  useAuthStore.getState().setToken(result.access_token);
+  setAuthTokens({
+    accessToken: result.access_token,
+    // TODO: store refresh token here when it appears in the OpenAPI schema.
+    refreshToken: null
+  });
 
   return result;
 }

@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "./auth-store";
-import { subscribeToAuthFailure } from "../../../shared/api/client";
+import { clearAuthTokens, subscribeToAuthFailure } from "../../../shared/api/auth";
 
 interface SessionContextValue {
   status: string;
@@ -18,11 +17,10 @@ interface SessionProviderProps {
 export function SessionProvider({ children }: SessionProviderProps) {
   const navigate = useNavigate();
   const [status, setStatus] = useState("Ready");
-  const logoutFromStore = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     return subscribeToAuthFailure((code) => {
-      setStatus(`Authorization failed with ${code}. Access token was cleared.`);
+      setStatus(`Authorization failed with ${code}. Stored auth tokens were cleared.`);
       navigate("/login", { replace: true });
     });
   }, [navigate]);
@@ -32,12 +30,12 @@ export function SessionProvider({ children }: SessionProviderProps) {
       status,
       setStatus,
       logout() {
-        logoutFromStore();
+        clearAuthTokens();
         setStatus("Logged out.");
         navigate("/login", { replace: true });
       }
     }),
-    [logoutFromStore, navigate, status]
+    [navigate, status]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

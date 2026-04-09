@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCreatePersonMutation, usePersonsByTreeQuery } from "../entities/person/model/use-person-queries";
 import { useSession } from "../features/auth/model/session-context";
-import { getErrorMessage } from "../shared/api/errors";
+import { getErrorMessage } from "../shared/api/client";
 import { Field } from "../shared/ui/Field";
 import { PageSection } from "../shared/ui/PageSection";
 import { Panel } from "../shared/ui/Panel";

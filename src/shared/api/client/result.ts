@@ -1,4 +1,4 @@
-import { toApiError } from "./client";
+import { toApiError } from "./http-client";
 
 export function unwrap<TData, TError>(
   data: TData | undefined,

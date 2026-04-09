@@ -1,5 +1,4 @@
-import { apiClient } from "../../../shared/api/client";
-import { unwrap } from "../../../shared/api/result";
+import { apiClient, unwrap } from "../../../shared/api/client";
 import type { PersonCreate } from "../../../shared/types/api";
 
 export async function createPerson(payload: PersonCreate) {

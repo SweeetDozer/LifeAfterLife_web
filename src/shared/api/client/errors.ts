@@ -17,6 +17,7 @@ export function getErrorMessage(error: unknown): string {
       if (typeof detail === "string") {
         return detail;
       }
+
       if (Array.isArray(detail)) {
         return detail
           .map((item) =>
@@ -27,6 +28,7 @@ export function getErrorMessage(error: unknown): string {
           .join(", ");
       }
     }
+
     return error.message;
   }
 

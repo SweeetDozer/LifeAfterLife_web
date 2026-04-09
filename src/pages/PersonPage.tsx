@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { usePersonQuery } from "../entities/person/model/use-person-queries";
 import { useSession } from "../features/auth/model/session-context";
-import { getErrorMessage } from "../shared/api/errors";
+import { getErrorMessage } from "../shared/api/client";
 import { PageSection } from "../shared/ui/PageSection";
 import { Panel } from "../shared/ui/Panel";
 

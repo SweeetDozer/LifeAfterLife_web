@@ -7,6 +7,7 @@ export type UserCreate = components["schemas"]["UserCreate"];
 export type UserLogin = components["schemas"]["UserLogin"];
 export type UserLoginResponse = components["schemas"]["UserLoginResponse"];
 export type UserRegistrationResponse = components["schemas"]["UserRegistrationResponse"];
+export type UserLoginResponseTokenType = UserLoginResponse["token_type"];
 
 export type TreeCreate = components["schemas"]["TreeCreate"];
 export type TreeCreateResponse = components["schemas"]["TreeCreateResponse"];
