@@ -111,12 +111,17 @@ export function PersonPage() {
   }
 
   return (
-    <PageSection title={`Person #${parsedPersonId}`} description="Review the current data, update it, or remove the person from the tree.">
+    <PageSection
+      title={`Person #${parsedPersonId}`}
+      description="Use this page to review one person, adjust their data, or remove them from the tree if needed."
+    >
       <div className="page-grid">
-        <Panel title={personTitle}>
-          {personQuery.isLoading ? <p>Loading person details...</p> : null}
-          {personQuery.isError ? <p>{getErrorMessage(personQuery.error)}</p> : null}
-          {!personQuery.isLoading && !personQuery.isError && !personQuery.data ? <p>Person not found.</p> : null}
+        <Panel title={personTitle} subtitle="Current values from the backend are shown here as a quick reference.">
+          {personQuery.isLoading ? <p className="state-message">Loading person details...</p> : null}
+          {personQuery.isError ? <p className="state-message state-error">{getErrorMessage(personQuery.error)}</p> : null}
+          {!personQuery.isLoading && !personQuery.isError && !personQuery.data ? (
+            <p className="state-message state-empty">Person not found.</p>
+          ) : null}
           {personQuery.data ? (
             <div className="detail-list">
               <span>ID: {personQuery.data.id}</span>
@@ -134,9 +139,9 @@ export function PersonPage() {
           ) : null}
         </Panel>
 
-        <Panel title="Edit person">
+        <Panel title="Edit person" subtitle="Save small updates here without leaving the details page.">
           {!personQuery.data ? (
-            <p>Load a valid person to edit.</p>
+            <p className="state-message state-empty">Load a valid person to edit.</p>
           ) : (
             <form className="stack" onSubmit={handleUpdateSubmit}>
               <Field
@@ -196,9 +201,11 @@ export function PersonPage() {
                   <option value="other">other</option>
                 </select>
               </label>
-              <div className="actions-row">
-                <button type="submit">Save person</button>
-                <button className="ghost" type="button" onClick={() => void handleDeleteClick()}>
+              <button type="submit">Save person</button>
+              <div className="danger-zone">
+                <strong>Danger zone</strong>
+                <p>Deleting a person also removes relationships that depend on this record.</p>
+                <button className="ghost danger-button" type="button" onClick={() => void handleDeleteClick()}>
                   Delete person
                 </button>
               </div>
@@ -206,10 +213,10 @@ export function PersonPage() {
           )}
         </Panel>
       </div>
-      {updatePersonMutation.isPending ? <p>Saving person changes...</p> : null}
-      {updatePersonMutation.isError ? <p>{getErrorMessage(updatePersonMutation.error)}</p> : null}
-      {deletePersonMutation.isPending ? <p>Deleting person...</p> : null}
-      {deletePersonMutation.isError ? <p>{getErrorMessage(deletePersonMutation.error)}</p> : null}
+      {updatePersonMutation.isPending ? <p className="state-message">Saving person changes...</p> : null}
+      {updatePersonMutation.isError ? <p className="state-message state-error">{getErrorMessage(updatePersonMutation.error)}</p> : null}
+      {deletePersonMutation.isPending ? <p className="state-message">Deleting person...</p> : null}
+      {deletePersonMutation.isError ? <p className="state-message state-error">{getErrorMessage(deletePersonMutation.error)}</p> : null}
     </PageSection>
   );
 }

@@ -102,10 +102,10 @@ export function RelationshipsPage() {
   return (
     <PageSection
       title={`Relationships for tree #${parsedTreeId}`}
-      description="Create or remove direct relationships between people in the selected tree."
+      description="Use this page to connect two people in the selected tree or remove a relationship when you already know its ID."
     >
       <div className="page-grid">
-        <Panel title="Create relationship">
+        <Panel title="Create relationship" subtitle="Pick two people and describe how Person A relates to Person B.">
           <form className="stack" onSubmit={handleSubmit}>
             <Field
               label="Tree ID"
@@ -175,7 +175,7 @@ export function RelationshipsPage() {
 
         <Panel
           title="Delete relationship"
-          subtitle="A full relationship list is not available in the current API flow, so deletion stays intentionally minimal."
+          subtitle="Deletion stays intentionally minimal because the current API flow does not provide a relationship list for this page."
         >
           <form className="stack" onSubmit={handleDeleteSubmit}>
             {lastCreatedRelationshipId ? (
@@ -191,19 +191,23 @@ export function RelationshipsPage() {
               </button>
             ) : null}
             <Field
-              label="Relationship ID"
+              label="Relationship ID to delete"
               min={1}
               type="number"
               value={relationshipIdToDelete}
               onChange={setRelationshipIdToDelete}
             />
-            <button className="ghost" type="submit">
-              Delete by relationship ID
-            </button>
+            <div className="danger-zone compact-danger">
+              <strong>Danger zone</strong>
+              <p>Use this only when you are sure which relationship record you want to remove.</p>
+              <button className="ghost danger-button" type="submit">
+                Delete by relationship ID
+              </button>
+            </div>
           </form>
         </Panel>
 
-        <Panel title="Available people">
+        <Panel title="Available people" subtitle="These are the people currently available for relationship creation in this tree.">
           <div className="stack">
             <Link
               className="ghost-link"
@@ -211,10 +215,10 @@ export function RelationshipsPage() {
             >
               Back to tree
             </Link>
-            {personsQuery.isLoading ? <p>Loading people...</p> : null}
-            {personsQuery.isError ? <p>{getErrorMessage(personsQuery.error)}</p> : null}
+            {personsQuery.isLoading ? <p className="state-message">Loading people...</p> : null}
+            {personsQuery.isError ? <p className="state-message state-error">{getErrorMessage(personsQuery.error)}</p> : null}
             {!personsQuery.isLoading && !personsQuery.isError && (personOptions.length === 0) ? (
-              <p>No people found for this tree. Add people on the tree page first.</p>
+              <p className="state-message state-empty">No people found for this tree. Add people on the tree page first.</p>
             ) : null}
             <div className="list">
               {personOptions.map((person) => (
@@ -227,10 +231,10 @@ export function RelationshipsPage() {
           </div>
         </Panel>
       </div>
-      {createRelationshipMutation.isPending ? <p>Saving relationship...</p> : null}
-      {createRelationshipMutation.isError ? <p>{getErrorMessage(createRelationshipMutation.error)}</p> : null}
-      {deleteRelationshipMutation.isPending ? <p>Deleting relationship...</p> : null}
-      {deleteRelationshipMutation.isError ? <p>{getErrorMessage(deleteRelationshipMutation.error)}</p> : null}
+      {createRelationshipMutation.isPending ? <p className="state-message">Saving relationship...</p> : null}
+      {createRelationshipMutation.isError ? <p className="state-message state-error">{getErrorMessage(createRelationshipMutation.error)}</p> : null}
+      {deleteRelationshipMutation.isPending ? <p className="state-message">Deleting relationship...</p> : null}
+      {deleteRelationshipMutation.isError ? <p className="state-message state-error">{getErrorMessage(deleteRelationshipMutation.error)}</p> : null}
     </PageSection>
   );
 }

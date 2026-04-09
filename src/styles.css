@@ -159,6 +159,26 @@ label {
   gap: 0.75rem;
 }
 
+.state-message {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #334e68;
+}
+
+.state-error {
+  border-color: #ef9a9a;
+  background: #fff4f4;
+  color: #8a1c1c;
+}
+
+.state-empty {
+  background: #f8fafc;
+  color: #52606d;
+}
+
 .list-item {
   display: flex;
   justify-content: space-between;
@@ -168,6 +188,15 @@ label {
   border: 1px solid #d9e2ec;
   border-radius: 8px;
   background: #fff;
+}
+
+.list-item-main {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.list-item-main span {
+  color: #52606d;
 }
 
 .checkbox {
@@ -183,6 +212,51 @@ label {
 
 .detail-list span {
   display: block;
+}
+
+.danger-zone {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f3c4c4;
+  border-radius: 8px;
+  background: #fff7f7;
+}
+
+.danger-zone p,
+.danger-zone strong {
+  margin: 0;
+}
+
+.compact-danger {
+  margin-top: 0.25rem;
+}
+
+.danger-button {
+  border-color: #d66;
+  color: #8a1c1c;
+}
+
+.result-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.result-card p {
+  margin: 0;
+}
+
+.result-primary {
+  font-weight: 600;
+  color: #102a43;
+}
+
+.result-secondary {
+  color: #52606d;
 }
 
 @media (max-width: 900px) {

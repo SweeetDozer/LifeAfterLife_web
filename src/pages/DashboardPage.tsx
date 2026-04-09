@@ -33,9 +33,12 @@ export function DashboardPage() {
   }
 
   return (
-    <PageSection title="Your trees" description="Create a tree and open it to manage people, relationships, and kinship lookups.">
+    <PageSection
+      title="Your trees"
+      description="Start with a tree, then open it to manage people, direct relationships, and kinship lookups."
+    >
       <div className="page-grid">
-        <Panel title="Create a tree">
+        <Panel title="Create a tree" subtitle="Use a short name and optional description so it is easy to find later.">
           <form className="stack" onSubmit={handleSubmit}>
             <Field
               label="Tree name"
@@ -62,20 +65,25 @@ export function DashboardPage() {
           </form>
         </Panel>
 
-        <Panel title="Available trees" subtitle="Open a tree to manage people and relationships.">
+        <Panel title="Available trees" subtitle="Open any tree to continue working with people, relationships, and kinship.">
           <div className="stack">
             <button className="ghost" type="button" onClick={() => void treesQuery.refetch()}>
               Refresh list
             </button>
-            {treesQuery.isLoading ? <p>Loading your trees...</p> : null}
-            {treesQuery.isError ? <p>{getErrorMessage(treesQuery.error)}</p> : null}
+            {treesQuery.isLoading ? <p className="state-message">Loading your trees...</p> : null}
+            {treesQuery.isError ? <p className="state-message state-error">{getErrorMessage(treesQuery.error)}</p> : null}
             {!treesQuery.isLoading && !treesQuery.isError && (treesQuery.data?.length ?? 0) === 0 ? (
-              <p>You do not have any trees yet. Create the first one using the form on the left.</p>
+              <p className="state-message state-empty">
+                You do not have any trees yet. Create the first one using the form on the left.
+              </p>
             ) : null}
             <div className="list">
               {(treesQuery.data ?? []).map((tree) => (
                 <Link className="list-item" key={tree.id} to={`/trees/${tree.id}`}>
-                  <strong>{tree.name}</strong>
+                  <div className="list-item-main">
+                    <strong>{tree.name}</strong>
+                    <span>{tree.description || "No description yet."}</span>
+                  </div>
                   <span>
                     #{tree.id} | {tree.access_level}
                   </span>
@@ -85,8 +93,10 @@ export function DashboardPage() {
           </div>
         </Panel>
       </div>
-      {createTreeMutation.isPending ? <p>Creating tree...</p> : null}
-      {createTreeMutation.isError ? <p>{getErrorMessage(createTreeMutation.error)}</p> : null}
+      {createTreeMutation.isPending ? <p className="state-message">Creating tree...</p> : null}
+      {createTreeMutation.isError ? (
+        <p className="state-message state-error">{getErrorMessage(createTreeMutation.error)}</p>
+      ) : null}
     </PageSection>
   );
 }

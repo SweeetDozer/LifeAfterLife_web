@@ -102,9 +102,12 @@ export function KinshipPage() {
   }
 
   return (
-    <PageSection title={`Kinship for tree #${parsedTreeId}`} description="Graph and kinship queries are isolated from the tree and person pages.">
+    <PageSection
+      title={`Kinship for tree #${parsedTreeId}`}
+      description="Compare two people in the same tree to see the raw graph path and the interpreted kinship result."
+    >
       <div className="page-grid">
-        <Panel title="Find path and kinship">
+        <Panel title="Select two people" subtitle="Use the same tree ID and compare one person against another.">
           <form className="stack" onSubmit={handlePathSubmit}>
             <Field
               label="Tree ID"
@@ -129,33 +132,55 @@ export function KinshipPage() {
             />
             <button type="submit">Find graph path</button>
             <button className="ghost" type="button" onClick={() => void handleKinshipLoad()}>
-              Find kinship
+              Find kinship result
             </button>
           </form>
         </Panel>
 
-        <Panel title="Results">
-          <div className="detail-list">
-            <span>
-              Path:{" "}
-              {graphPathQuery.isLoading
-                ? "Loading..."
-                : graphPathQuery.isError
-                  ? getErrorMessage(graphPathQuery.error)
-                  : graphPathQuery.data
-                    ? graphPathQuery.data.path.join(" -> ")
-                    : "No data yet"}
-            </span>
-            <span>
-              Kinship:{" "}
-              {kinshipQuery.isLoading
-                ? "Loading..."
-                : kinshipQuery.isError
-                  ? getErrorMessage(kinshipQuery.error)
-                  : kinshipQuery.data
-                    ? `${kinshipQuery.data.result} | ${kinshipQuery.data.line}`
-                    : "No data yet"}
-            </span>
+        <Panel title="Results" subtitle="The graph path shows raw IDs, while kinship gives the readable interpretation.">
+          <div className="stack">
+            <div className="result-card">
+              <strong>Graph path</strong>
+              {graphPathQuery.isLoading ? <p className="state-message">Loading graph path...</p> : null}
+              {graphPathQuery.isError ? (
+                <p className="state-message state-error">{getErrorMessage(graphPathQuery.error)}</p>
+              ) : null}
+              {!graphPathQuery.isLoading && !graphPathQuery.isError && !graphPathQuery.data ? (
+                <p className="state-message state-empty">No graph path requested yet.</p>
+              ) : null}
+              {graphPathQuery.data ? (
+                <>
+                  <p className="result-primary">{graphPathQuery.data.path.join(" -> ")}</p>
+                  <p className="result-secondary">Path length: {graphPathQuery.data.path.length}</p>
+                </>
+              ) : null}
+            </div>
+
+            <div className="result-card">
+              <strong>Kinship interpretation</strong>
+              {kinshipQuery.isLoading ? <p className="state-message">Loading kinship result...</p> : null}
+              {kinshipQuery.isError ? (
+                <p className="state-message state-error">{getErrorMessage(kinshipQuery.error)}</p>
+              ) : null}
+              {!kinshipQuery.isLoading && !kinshipQuery.isError && !kinshipQuery.data ? (
+                <p className="state-message state-empty">No kinship result requested yet.</p>
+              ) : null}
+              {kinshipQuery.data ? (
+                <div className="detail-list">
+                  <span className="result-primary">{kinshipQuery.data.result}</span>
+                  <span>{kinshipQuery.data.line}</span>
+                  <span>Path: {kinshipQuery.data.path.join(" -> ")}</span>
+                  <span>
+                    Relations:{" "}
+                    {kinshipQuery.data.relations.length > 0
+                      ? kinshipQuery.data.relations.map((relation) => `${relation.type} -> ${relation.to}`).join(", ")
+                      : "No detailed relation steps provided"}
+                  </span>
+                  <span>LCA: {kinshipQuery.data.lca ?? "Not provided"}</span>
+                </div>
+              ) : null}
+            </div>
+
             <Link
               className="ghost-link"
               to={Number.isFinite(parsedTreeId) && parsedTreeId > 0 ? `/trees/${parsedTreeId}` : "/dashboard"}

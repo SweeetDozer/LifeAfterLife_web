@@ -201,15 +201,15 @@ export function TreePage() {
   return (
     <PageSection
       title={currentTree ? currentTree.name : `Tree #${parsedTreeId}`}
-      description="Manage the tree itself, the people inside it, and who can access it."
+      description="Review tree settings, keep the people list up to date, and manage who can work with this tree."
     >
       <div className="page-grid">
-        <Panel title="Tree settings">
-          {!currentTree && treesQuery.isLoading ? <p>Loading tree details...</p> : null}
+        <Panel title="Tree settings" subtitle="Keep the tree name, description, and visibility in sync with how you want to use it.">
+          {!currentTree && treesQuery.isLoading ? <p className="state-message">Loading tree details...</p> : null}
           {!currentTree && !treesQuery.isLoading && !treesQuery.isError ? (
-            <p>Tree details are limited until the tree list is loaded.</p>
+            <p className="state-message state-empty">Tree details are limited until the tree list is loaded.</p>
           ) : null}
-          {treesQuery.isError ? <p>{getErrorMessage(treesQuery.error)}</p> : null}
+          {treesQuery.isError ? <p className="state-message state-error">{getErrorMessage(treesQuery.error)}</p> : null}
           <form className="stack" onSubmit={handleTreeSubmit}>
             <Field
               label="Tree name"
@@ -232,16 +232,18 @@ export function TreePage() {
               />
               <span>Make this tree visible to other users</span>
             </label>
-            <div className="actions-row">
-              <button type="submit">Save tree</button>
-              <button className="ghost" type="button" onClick={() => void handleDeleteTree()}>
-                Delete tree
-              </button>
-            </div>
+            <button type="submit">Save tree</button>
           </form>
+          <div className="danger-zone">
+            <strong>Danger zone</strong>
+            <p>Deleting a tree also removes its related people, relationships, and access entries.</p>
+            <button className="ghost danger-button" type="button" onClick={() => void handleDeleteTree()}>
+              Delete tree
+            </button>
+          </div>
         </Panel>
 
-        <Panel title="Add a person">
+        <Panel title="Add a person" subtitle="Use this quick form to keep building the tree person by person.">
           <form className="stack" onSubmit={handleSubmit}>
             <Field
               label="First name"
@@ -304,7 +306,7 @@ export function TreePage() {
           </form>
         </Panel>
 
-        <Panel title="People in this tree">
+        <Panel title="People in this tree" subtitle="Open a person card to review details, edit data, or remove them from the tree.">
           <div className="stack">
             <div className="actions-row">
               <button className="ghost" type="button" onClick={() => void personsQuery.refetch()}>
@@ -317,10 +319,12 @@ export function TreePage() {
                 Check kinship
               </Link>
             </div>
-            {personsQuery.isLoading ? <p>Loading people...</p> : null}
-            {personsQuery.isError ? <p>{getErrorMessage(personsQuery.error)}</p> : null}
+            {personsQuery.isLoading ? <p className="state-message">Loading people...</p> : null}
+            {personsQuery.isError ? <p className="state-message state-error">{getErrorMessage(personsQuery.error)}</p> : null}
             {!personsQuery.isLoading && !personsQuery.isError && (personsQuery.data?.length ?? 0) === 0 ? (
-              <p>No people in this tree yet. Add the first person using the form on this page.</p>
+              <p className="state-message state-empty">
+                No people in this tree yet. Add the first person using the form on this page.
+              </p>
             ) : null}
             <div className="list">
               {personLinks.map((person) => (
@@ -333,7 +337,7 @@ export function TreePage() {
           </div>
         </Panel>
 
-        <Panel title="Tree access" subtitle="Grant, update, or revoke access for other users.">
+        <Panel title="Tree access" subtitle="Grant, update, or revoke access for other users who need to work with this tree.">
           <form className="stack" onSubmit={handleAccessSubmit}>
             <Field
               label="User email"
@@ -359,10 +363,10 @@ export function TreePage() {
             <button type="submit">Grant access</button>
           </form>
 
-          {treeAccessQuery.isLoading ? <p>Loading access list...</p> : null}
-          {treeAccessQuery.isError ? <p>{getErrorMessage(treeAccessQuery.error)}</p> : null}
+          {treeAccessQuery.isLoading ? <p className="state-message">Loading access list...</p> : null}
+          {treeAccessQuery.isError ? <p className="state-message state-error">{getErrorMessage(treeAccessQuery.error)}</p> : null}
           {!treeAccessQuery.isLoading && !treeAccessQuery.isError && (treeAccessQuery.data?.length ?? 0) === 0 ? (
-            <p>No additional access entries yet.</p>
+            <p className="state-message state-empty">No additional access entries yet.</p>
           ) : null}
           <div className="list">
             {(treeAccessQuery.data ?? []).map((entry) => (
@@ -382,7 +386,7 @@ export function TreePage() {
                       type="button"
                       onClick={() => void handleToggleAccess(entry.user_id, entry.access_level)}
                     >
-                      Switch to {entry.access_level === "editor" ? "viewer" : "editor"}
+                      Change to {entry.access_level === "editor" ? "viewer" : "editor"}
                     </button>
                     <button
                       className="ghost"
@@ -398,18 +402,18 @@ export function TreePage() {
           </div>
         </Panel>
       </div>
-      {updateTreeMutation.isPending ? <p>Saving tree changes...</p> : null}
-      {updateTreeMutation.isError ? <p>{getErrorMessage(updateTreeMutation.error)}</p> : null}
-      {deleteTreeMutation.isPending ? <p>Deleting tree...</p> : null}
-      {deleteTreeMutation.isError ? <p>{getErrorMessage(deleteTreeMutation.error)}</p> : null}
-      {createPersonMutation.isPending ? <p>Saving person...</p> : null}
-      {createPersonMutation.isError ? <p>{getErrorMessage(createPersonMutation.error)}</p> : null}
-      {grantTreeAccessMutation.isPending ? <p>Granting access...</p> : null}
-      {grantTreeAccessMutation.isError ? <p>{getErrorMessage(grantTreeAccessMutation.error)}</p> : null}
-      {updateTreeAccessMutation.isPending ? <p>Updating access...</p> : null}
-      {updateTreeAccessMutation.isError ? <p>{getErrorMessage(updateTreeAccessMutation.error)}</p> : null}
-      {revokeTreeAccessMutation.isPending ? <p>Revoking access...</p> : null}
-      {revokeTreeAccessMutation.isError ? <p>{getErrorMessage(revokeTreeAccessMutation.error)}</p> : null}
+      {updateTreeMutation.isPending ? <p className="state-message">Saving tree changes...</p> : null}
+      {updateTreeMutation.isError ? <p className="state-message state-error">{getErrorMessage(updateTreeMutation.error)}</p> : null}
+      {deleteTreeMutation.isPending ? <p className="state-message">Deleting tree...</p> : null}
+      {deleteTreeMutation.isError ? <p className="state-message state-error">{getErrorMessage(deleteTreeMutation.error)}</p> : null}
+      {createPersonMutation.isPending ? <p className="state-message">Saving person...</p> : null}
+      {createPersonMutation.isError ? <p className="state-message state-error">{getErrorMessage(createPersonMutation.error)}</p> : null}
+      {grantTreeAccessMutation.isPending ? <p className="state-message">Granting access...</p> : null}
+      {grantTreeAccessMutation.isError ? <p className="state-message state-error">{getErrorMessage(grantTreeAccessMutation.error)}</p> : null}
+      {updateTreeAccessMutation.isPending ? <p className="state-message">Updating access...</p> : null}
+      {updateTreeAccessMutation.isError ? <p className="state-message state-error">{getErrorMessage(updateTreeAccessMutation.error)}</p> : null}
+      {revokeTreeAccessMutation.isPending ? <p className="state-message">Revoking access...</p> : null}
+      {revokeTreeAccessMutation.isError ? <p className="state-message state-error">{getErrorMessage(revokeTreeAccessMutation.error)}</p> : null}
     </PageSection>
   );
 }
