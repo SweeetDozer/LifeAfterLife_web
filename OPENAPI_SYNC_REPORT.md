@@ -4,7 +4,7 @@
 
 Schema was really updated from the live backend endpoint:
 
-- source: `http://localhost:8000/openapi.json`
+- source: `OPENAPI_SCHEMA_URL`
 - target: `src/shared/api/generated/schema.ts`
 - generation command succeeded
 
@@ -13,7 +13,7 @@ Schema was really updated from the live backend endpoint:
 Current script in `package.json`:
 
 ```json
-"generate:api": "openapi-typescript http://localhost:8000/openapi.json -o src/shared/api/generated/schema.ts"
+"generate:api": "node scripts/generate-openapi.mjs"
 ```
 
 ## What Changed In The Generated Schema
